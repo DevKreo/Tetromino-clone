@@ -6,16 +6,29 @@ public class Tetro : MonoBehaviour
 {
     float fall=0;
     public float fallSpeed = 1;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+
+    public int individualScore = 100;
+
+    private float individualScoreTime;
 
     // Update is called once per frame
     void Update()
     {
         CheckUserInput();
+        UpadeteIndividScore();
+    }
+
+    void UpadeteIndividScore()
+    {
+        if(individualScoreTime < 1)
+        {
+            individualScoreTime += Time.deltaTime;
+
+        }else
+        {
+            individualScoreTime = 0;
+            individualScore = Mathf.Max(individualScore - 10, 0);
+        }
     }
 
     void CheckUserInput()
@@ -63,6 +76,8 @@ public class Tetro : MonoBehaviour
                 }
 
                 enabled = false;
+
+                Game.currentScore += individualScore;
 
                 FindObjectOfType<Game>().SpawnNextTetro();
             }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public class Game : MonoBehaviour
@@ -9,10 +10,73 @@ public class Game : MonoBehaviour
     private static int gridHeight = 20;
 
     public static Transform[,] grid = new Transform[gridWidth, gridHeight];
+
+    public int scoreOneLine = 40;
+    public int scoreTwoLine = 80;
+    public int scoreThreeLine = 160;
+    public int scoreFourLine = 340;
+
+    public Text hud_score;
+
+    private int numOfRowsIsFull = 0;
+    public static int currentScore=0;
+
     // Start is called before the first frame update
     void Start()
     {
         SpawnNextTetro();
+    }
+
+    void Update()
+    {
+        UpdateScore();
+        UpdateUI();
+    }
+
+    public void UpdateUI()
+    {
+        hud_score.text = currentScore.ToString();
+    }
+
+    public void UpdateScore()
+    {
+        if(numOfRowsIsFull > 0)
+        {
+            if(numOfRowsIsFull == 1)
+            {
+                ClearedOneLine();
+            }else if (numOfRowsIsFull == 2)
+            {
+                ClearedTwoLine();
+            }
+            else if(numOfRowsIsFull == 3)
+            {
+                ClearedThreeLine();
+            }
+            else if(numOfRowsIsFull == 4)
+            {
+                ClearedFourLine();
+            }
+
+            numOfRowsIsFull = 0;
+        }
+    }
+
+    public void ClearedOneLine()
+    {
+        currentScore += scoreOneLine;
+    }
+    public void ClearedTwoLine()
+    {
+        currentScore += scoreTwoLine;
+    }
+    public void ClearedThreeLine()
+    {
+        currentScore += scoreThreeLine;
+    }
+    public void ClearedFourLine()
+    {
+        currentScore += scoreFourLine;
     }
 
     public bool CheckPositionOnGameOver(Tetro tetro)
@@ -40,6 +104,7 @@ public class Game : MonoBehaviour
                 return false;
             }
         }
+        numOfRowsIsFull++;
         return true;
     }
 
