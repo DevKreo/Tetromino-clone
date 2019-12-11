@@ -6,8 +6,14 @@ public class Tetro : MonoBehaviour
 {
     float fall=0;
     public float fallSpeed = 1;
+    public bool isAllowRotation = true;
+    public bool IsLimitRotation = false;
 
+
+ 
     public int individualScore = 100;
+
+ 
 
     private float individualScoreTime;
 
@@ -34,8 +40,11 @@ public class Tetro : MonoBehaviour
     void CheckUserInput()
     {
         if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
+        {   
+            
+
             transform.position += new Vector3(1, 0, 0);
+
             if (CheckIsValidPosition())
             {
                 FindObjectOfType<Game>().UpdateGrid(this);
@@ -86,16 +95,47 @@ public class Tetro : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Space))
         {
-            transform.Rotate(0, 0, 90);
-            if (CheckIsValidPosition())
+            if (isAllowRotation)
             {
-                FindObjectOfType<Game>().UpdateGrid(this);
-            }
-            else
-            {
-                transform.Rotate(0, 0, -90);
+                if (IsLimitRotation)
+                {
+                    if (transform.rotation.eulerAngles.z >= 90)
+                    {
+                        transform.Rotate(0, 0, -90);
+                    }
+                    else
+                    {
+                        transform.Rotate(0, 0, 90);
+                    }
+                }
+                else
+                {
+                    transform.Rotate(0, 0, 90);
+                }
+                if (CheckIsValidPosition())
+                {
+
+                }
+
+                else
+                {
+                    if (IsLimitRotation)
+                    {
+                        if (transform.rotation.eulerAngles.z >= 90)
+                        {
+                            transform.Rotate(0, 0, -90);
+                        }
+                        else
+                            transform.Rotate(0, 0, 90);
+                    }
+                    else
+                    {
+                        transform.Rotate(0, 0, -90);
+                    }
+                }
             }
         }
+           
     }
 
     bool CheckIsValidPosition()

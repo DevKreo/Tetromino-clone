@@ -19,7 +19,12 @@ public class Game : MonoBehaviour
     public Text hud_score;
 
     private int numOfRowsIsFull = 0;
-    public static int currentScore=0;
+    public static int currentScore = 0;
+
+    private GameObject prevTetro;
+    private GameObject nextTetro;
+    private bool gameStarted = false;
+    private Vector2 previewTetrominoPosition = new Vector2(-7.5f, 15.5f);
 
     // Start is called before the first frame update
     void Start()
@@ -40,20 +45,20 @@ public class Game : MonoBehaviour
 
     public void UpdateScore()
     {
-        if(numOfRowsIsFull > 0)
+        if (numOfRowsIsFull > 0)
         {
-            if(numOfRowsIsFull == 1)
+            if (numOfRowsIsFull == 1)
             {
                 ClearedOneLine();
-            }else if (numOfRowsIsFull == 2)
+            } else if (numOfRowsIsFull == 2)
             {
                 ClearedTwoLine();
             }
-            else if(numOfRowsIsFull == 3)
+            else if (numOfRowsIsFull == 3)
             {
                 ClearedThreeLine();
             }
-            else if(numOfRowsIsFull == 4)
+            else if (numOfRowsIsFull == 4)
             {
                 ClearedFourLine();
             }
@@ -81,9 +86,9 @@ public class Game : MonoBehaviour
 
     public bool CheckPositionOnGameOver(Tetro tetro)
     {
-        for(int x=0; x<gridWidth; x++)
+        for (int x = 0; x < gridWidth; x++)
         {
-            foreach(Transform mino in tetro.transform)
+            foreach (Transform mino in tetro.transform)
             {
                 Vector2 position = Round(mino.position);
                 if (position.y > gridHeight - 1)
@@ -97,9 +102,9 @@ public class Game : MonoBehaviour
 
     public bool IsFullRowAr(int y)
     {
-        for(int x= 0; x<gridWidth; x++)
+        for (int x = 0; x < gridWidth; x++)
         {
-            if (grid[x,y] == null)
+            if (grid[x, y] == null)
             {
                 return false;
             }
@@ -110,7 +115,7 @@ public class Game : MonoBehaviour
 
     public void DeleteMinoAt(int y)
     {
-        for(int x= 0; x<gridWidth; x++)
+        for (int x = 0; x < gridWidth; x++)
         {
             Destroy(grid[x, y].gameObject);
             grid[x, y] = null;
@@ -119,9 +124,9 @@ public class Game : MonoBehaviour
 
     public void MoveRowDown(int y)
     {
-        for(int x = 0; x<gridWidth; x++)
+        for (int x = 0; x < gridWidth; x++)
         {
-            if(grid[x,y] != null)
+            if (grid[x, y] != null)
             {
                 grid[x, y - 1] = grid[x, y];
                 grid[x, y] = null;
@@ -132,7 +137,7 @@ public class Game : MonoBehaviour
 
     public void MoveAllRowsDown(int y)
     {
-        for(int i =y; i<gridHeight; i++)
+        for (int i = y; i < gridHeight; i++)
         {
             MoveRowDown(i);
         }
@@ -140,7 +145,7 @@ public class Game : MonoBehaviour
 
     public void DeleteRow()
     {
-        for(int y=0; y<gridHeight; y++)
+        for (int y = 0; y < gridHeight; y++)
         {
             if (IsFullRowAr(y))
             {
@@ -153,23 +158,23 @@ public class Game : MonoBehaviour
 
     public void UpdateGrid(Tetro tetro)
     {
-        for(int y = 0; y<gridHeight; y++)
+        for (int y = 0; y < gridHeight; y++)
         {
-            for (int x=0; x<gridWidth; x++)
+            for (int x = 0; x < gridWidth; x++)
             {
-                if(grid[x,y] != null)
+                if (grid[x, y] != null)
                 {
-                    if (grid[x,y].parent == tetro.transform)
+                    if (grid[x, y].parent == tetro.transform)
                     {
                         grid[x, y] = null;
                     }
                 }
             }
         }
-        foreach(Transform mino in tetro.transform)
+        foreach (Transform mino in tetro.transform)
         {
             Vector2 pos = Round(mino.position);
-            if(pos.y < gridHeight)
+            if (pos.y < gridHeight)
             {
                 grid[(int)pos.x, (int)pos.y] = mino;
             }
@@ -191,7 +196,23 @@ public class Game : MonoBehaviour
 
     public void SpawnNextTetro()
     {
-        GameObject nextTetro = (GameObject)Instantiate(Resources.Load(TetroRandomize(), typeof(GameObject)), new Vector2(5.0f, 21.0f),Quaternion.identity);
+        if (!gameStarted)
+        {
+            gameStarted = true;
+
+            nextTetro = (GameObject)Instantiate(Resources.Load(TetroRandomize(), typeof(GameObject)), new Vector2(5.0f, 21.0f), Quaternion.identity);
+            prevTetro = (GameObject)Instantiate(Resources.Load(TetroRandomize(), typeof(GameObject)), previewTetrominoPosition, Quaternion.identity);
+            prevTetro.GetComponent<Tetro>().enabled = false;
+        }
+        else
+        {
+            prevTetro.transform.localPosition = new Vector2(5.0f, 20.0f);
+            nextTetro = prevTetro;
+            nextTetro.GetComponent<Tetro>().enabled = true;
+
+            prevTetro = (GameObject)Instantiate(Resources.Load(TetroRandomize(), typeof(GameObject)), previewTetrominoPosition, Quaternion.identity);
+            prevTetro.GetComponent<Tetro>().enabled = false;
+        }
     }
 
 
