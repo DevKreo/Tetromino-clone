@@ -5,18 +5,16 @@ using UnityEngine;
 public class Tetro : MonoBehaviour
 {
     float fall=0;
-    public float fallSpeed = 1;
+    private float fallSpeed;
     public bool isAllowRotation = true;
     public bool IsLimitRotation = false;
-
-
- 
     public int individualScore = 100;
-
- 
-
     private float individualScoreTime;
 
+    private void Start()
+    {
+        fallSpeed = GameObject.Find("GameScript").GetComponent<Game>().fallSpeed;
+    }
     // Update is called once per frame
     void Update()
     {

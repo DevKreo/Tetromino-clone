@@ -16,7 +16,14 @@ public class Game : MonoBehaviour
     public int scoreThreeLine = 160;
     public int scoreFourLine = 340;
 
+    public int currentLevel = 0;
+    private int numLinesCleared = 0;
+
+    public float fallSpeed = 1.0f;
+
     public Text hud_score;
+    public Text hud_level;
+    public Text hud_lines;
 
     private int numOfRowsIsFull = 0;
     public static int currentScore = 0;
@@ -24,7 +31,7 @@ public class Game : MonoBehaviour
     private GameObject prevTetro;
     private GameObject nextTetro;
     private bool gameStarted = false;
-    private Vector2 previewTetrominoPosition = new Vector2(-7.5f, 15.5f);
+    private Vector2 previewTetrominoPosition = new Vector2(-8f, 15f);
 
     // Start is called before the first frame update
     void Start()
@@ -36,11 +43,24 @@ public class Game : MonoBehaviour
     {
         UpdateScore();
         UpdateUI();
+        UpdateLevel();
+        UpdateSpeed();
+    }
+
+    void UpdateLevel()
+    {
+        currentLevel = numLinesCleared / 10;
+    }
+    void UpdateSpeed()
+    {
+        fallSpeed = 1.0f - ((float)currentLevel * 0.1f);
     }
 
     public void UpdateUI()
     {
         hud_score.text = currentScore.ToString();
+        hud_level.text = currentLevel.ToString();
+        hud_lines.text = numLinesCleared.ToString();
     }
 
     public void UpdateScore()
@@ -69,19 +89,23 @@ public class Game : MonoBehaviour
 
     public void ClearedOneLine()
     {
-        currentScore += scoreOneLine;
+        currentScore += scoreOneLine + (currentLevel * 20);
+        numLinesCleared++;
     }
     public void ClearedTwoLine()
     {
-        currentScore += scoreTwoLine;
+        currentScore += scoreTwoLine + (currentLevel * 30); ;
+        numLinesCleared += 2;
     }
     public void ClearedThreeLine()
     {
-        currentScore += scoreThreeLine;
+        currentScore += scoreThreeLine + (currentLevel * 40); ;
+        numLinesCleared += 3;
     }
     public void ClearedFourLine()
     {
-        currentScore += scoreFourLine;
+        currentScore += scoreFourLine + (currentLevel * 50); ;
+        numLinesCleared += 4;
     }
 
     public bool CheckPositionOnGameOver(Tetro tetro)
