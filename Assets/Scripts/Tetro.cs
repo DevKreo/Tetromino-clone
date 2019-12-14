@@ -11,6 +11,17 @@ public class Tetro : MonoBehaviour
     public int individualScore = 100;
     private float individualScoreTime;
 
+    private float continuousVertSpeed = 0.05f; // down speed
+    private float continuousHorizSpeed = 0.1f; // horizontal speed (left or right)
+    private float buttonDownWaitMax = 0.2f; //how long to wait the tetro recognized that a button being held down
+    private float verticalTimer = 0;
+    private float horizontalTimer = 0;
+    private float buttonDownWaitTimerHorizontal = 0;
+    private float buttonDownWaitTimerVertical = 0;
+
+    private bool movedImmediateHorizontal = false;
+    private bool movedImmediateVertical = false;
+
     //Переменные для тачскрина
     private int touchSensitivityHorizontal = 8;
     private int touchSensitivityVertical = 4;
@@ -45,7 +56,7 @@ public class Tetro : MonoBehaviour
     void CheckUserInput()
     {
 
-        #if UNITY_ANDROID
+#if UNITY_ANDROID
 
         if (Input.touchCount > 0)
         {
@@ -95,21 +106,34 @@ public class Tetro : MonoBehaviour
             MoveDown();
         }
 
-        #else
+#else
 
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+        if (Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow))
+        {
+            movedImmediateHorizontal = false;
+            horizontalTimer = 0;
+            buttonDownWaitTimerHorizontal = 0;
+        }
+        if (Input.GetKeyUp(KeyCode.DownArrow))
+        {
+            movedImmediateVertical = false;
+            verticalTimer = 0;
+            buttonDownWaitTimerVertical = 0;
+        }
+
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             MoveRight();
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow))
         {
             MoveLeft();
         }
-        else if (Input.GetKey(KeyCode.DownArrow) || Time.time - fall >= fallSpeed)
+        if (Input.GetKey(KeyCode.DownArrow) || Time.time - fall >= fallSpeed)
         {
             MoveDown();
         }
-        else if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Rotate();
         }
@@ -135,6 +159,25 @@ public class Tetro : MonoBehaviour
 
     void MoveLeft()
     {
+        if (movedImmediateHorizontal)
+        {
+            if (buttonDownWaitTimerHorizontal < buttonDownWaitMax)
+            {
+                buttonDownWaitTimerHorizontal += Time.deltaTime;
+                return;
+            }
+
+            if (horizontalTimer < continuousHorizSpeed)
+            {
+                horizontalTimer += Time.deltaTime;
+                return;
+            }
+        }
+        if (!movedImmediateHorizontal)
+            movedImmediateHorizontal = true;
+
+        horizontalTimer = 0;
+
         transform.position += new Vector3(-1, 0, 0);
         if (CheckIsValidPosition())
         {
@@ -148,6 +191,25 @@ public class Tetro : MonoBehaviour
 
     void MoveRight()
     {
+        if (movedImmediateHorizontal)
+        {
+            if (buttonDownWaitTimerHorizontal < buttonDownWaitMax)
+            {
+                buttonDownWaitTimerHorizontal += Time.deltaTime;
+                return;
+            }
+            if (horizontalTimer < continuousHorizSpeed)
+            {
+                horizontalTimer += Time.deltaTime;
+                return;
+            }
+        }
+
+        if (!movedImmediateHorizontal)
+            movedImmediateHorizontal = true;
+
+        horizontalTimer = 0;
+
         transform.position += new Vector3(1, 0, 0);
 
         if (CheckIsValidPosition())
@@ -162,6 +224,25 @@ public class Tetro : MonoBehaviour
 
     void MoveDown()
     {
+        if (movedImmediateVertical)
+        {
+            if (buttonDownWaitTimerVertical < buttonDownWaitMax)
+            {
+                buttonDownWaitTimerVertical += Time.deltaTime;
+                return;
+            }
+
+            if (verticalTimer < continuousVertSpeed)
+            {
+                verticalTimer += Time.deltaTime;
+                return;
+            }
+        }
+        if (!movedImmediateVertical)
+            movedImmediateVertical = true;
+
+        verticalTimer = 0;
+
         transform.position += new Vector3(0, -1, 0);
         if (CheckIsValidPosition())
         {
